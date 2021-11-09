@@ -1,4 +1,5 @@
 # meetup-vue3-fb
+use Vue3 + Tailwind + Firebase
 
 ## Project setup
 ```
@@ -22,3 +23,6 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+### set local port
+npm run serve -- --port XXXX
