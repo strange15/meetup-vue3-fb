@@ -1,11 +1,19 @@
 <template>
   <div class="home">
     <div class="button-container flex flex-col lg:flex-row justify-center items-center mt-8 mb-4">
-      <div><el-button type="primary">EXPLORE MEETUPS</el-button></div>
-      <div class="mt-3 lg:ml-4 lg:mt-0"><el-button type="primary">ORGANIZE MEETUP</el-button></div>
+      <div>
+        <router-link to="/meetups">
+          <el-button type="primary">EXPLORE MEETUPS</el-button>
+        </router-link>
+      </div>
+      <div class="mt-3 lg:ml-4 lg:mt-0">
+        <router-link to="/meetup/new">
+          <el-button type="primary">ORGANIZE MEETUP</el-button>
+        </router-link>
+      </div>
     </div>
     <!-- TODO carousel -> click img to→ /meetups/meetup.id -->
-    <el-carousel trigger="click" arrow="always" height="28rem" interval="5000" class="w-5/6 mx-auto my-0">
+    <el-carousel trigger="click" arrow="always" height="28rem" :interval="5000" class="w-5/6 mx-auto my-0">
       <el-carousel-item class="relative" v-for="item in carouselList" :key="item">
         <el-image
           class="w-full h-full"

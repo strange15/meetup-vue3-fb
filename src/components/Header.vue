@@ -8,18 +8,18 @@
     </div>
     <!-- TODO in 1920 if no auth: only show: Sign up & Sign in -->
     <div class="hidden justify-between items-center nav lg:flex">
-      <div class="flex justify-start items-center ml-6 cursor-pointer text-sm">
+      <router-link to="/meetups" class="flex justify-start items-center ml-6 cursor-pointer text-sm">
         <font-awesome-icon class="icon" :icon="['fas', 'user-friends']" />
         <span class="nav-item ml-4">VIEW MEETUPS</span>
-      </div>
-      <div class="flex justify-start items-center ml-6 cursor-pointer text-sm">
+      </router-link>
+      <router-link to="/meetup/new" class="flex justify-start items-center ml-6 cursor-pointer text-sm">
         <font-awesome-icon class="icon" :icon="['fas', 'map-marker-alt']" />
         <span class="nav-item ml-4">ORGANIZE MEETUP</span>
-      </div>
-      <div class="flex justify-start items-center ml-6 cursor-pointer text-sm">
+      </router-link>
+      <!-- <div class="flex justify-start items-center ml-6 cursor-pointer text-sm">
         <font-awesome-icon class="icon" :icon="['fas', 'user']" />
         <span class="nav-item ml-4">PROFILE</span>
-      </div>
+      </div> -->
       <div class="flex justify-start items-center ml-6 cursor-pointer text-sm">
         <font-awesome-icon class="icon" :icon="['fas', 'user-plus']" />
         <span class="nav-item ml-4">SIGN UP</span>
@@ -46,10 +46,10 @@
           <font-awesome-icon class="icon" :icon="['fas', 'map-marker-alt']" />
           <span class="ml-8">Organize Meetup</span>
         </div>
-        <div class="flex justify-start items-center p-2 mb-2">
+        <!-- <div class="flex justify-start items-center p-2 mb-2">
           <font-awesome-icon class="icon" :icon="['fas', 'user']" />
           <span class="ml-8">Profile</span>
-        </div>
+        </div> -->
         <!-- TODO if no auth: only show: Sign up & Sign in -->
         <div class="flex justify-start items-center p-2 mb-2">
           <font-awesome-icon class="icon" :icon="['fas', 'user-plus']" />
