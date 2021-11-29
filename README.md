@@ -25,4 +25,6 @@ npm run lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### set local port
+```
 npm run serve -- --port XXXX
+```
