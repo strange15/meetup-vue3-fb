@@ -1,5 +1,5 @@
 # meetup-vue3-fb
-use Vue3 + Tailwind + Firebase
+use Vue3 + Tailwind + ElementUI plus + Firebase
 
 ## Project setup
 ```
