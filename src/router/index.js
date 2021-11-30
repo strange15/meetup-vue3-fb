@@ -19,12 +19,12 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "organize" */ "../views/organize.vue"),
   },
-  // {
-  //   path: '/meetups/:id',
-  //   name: 'Meetup',
-  //   props: true,
-  //   component: Meetup
-  // },
+  {
+    path: '/meetups/:id',
+    name: 'Meetup',
+    component: () =>
+      import(/* webpackChunkName: "meetup" */ "../views/meetup.vue"),
+  },
 ];
 
 const router = createRouter({
