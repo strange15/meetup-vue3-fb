@@ -26,12 +26,28 @@ export default createStore({
     setLoadedMeetups (state, payload) {
       state.loadedMeetups = payload
     },
+    createMeetup (state, payload) {
+      state.loadedMeetups.push(payload)
+    },
   },
   actions: {
     // loadMeetups ({commit}) {
     // },
-    // createMeetup ({commit, getters}, payload) {
-    // },
+    createMeetup ({commit}, payload) {
+      console.log("🚀 ~ file: index.js ~ line 37 ~ createMeetup ~ payload", payload)
+      let date1 = dayjs(payload.date1).format("YYYY-MM-DD")
+      let date2 = dayjs(payload.date2).format("HH:mm:ss")
+      const meetup = {
+        title: payload['value'].title,
+        location: payload['value'].location,
+        imageUrl: payload['value'].imageUrl,
+        description: payload['value'].description,
+        date: `${date1} ${date2}`,
+        // creatorId: getters.user.id
+        id: Date.now()
+      }
+      commit('createMeetup', { ...meetup})
+    },
     // signUserUp ({commit}, payload) {
     // },
     // signUserIn ({commit}, payload) {
