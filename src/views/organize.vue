@@ -120,6 +120,7 @@ export default {
       meetupForm["value"].validate((valid) => {
         if (valid) {
           store.dispatch("createMeetup", ruleForm);
+          // TODO: go to /meetups after adding success
         } else {
           return false;
         }
