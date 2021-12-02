@@ -33,7 +33,7 @@
   </div>
 </template>
 <script>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 
@@ -43,7 +43,11 @@ export default {
     const router = useRouter();
     const signupForm = ref();
     let loading = store.getters.loading;
-    let user = store.getters.user;
+    onMounted(() => {
+      if (store.getters.user) {
+        router.push({ name: "Home" });
+      }
+    });
     let ruleForm = ref({
       email: "",
       password: "",
@@ -80,30 +84,18 @@ export default {
       signupForm["value"].validate((valid) => {
         if (valid) {
           store.dispatch("signUserUp", ruleForm);
-          router.push({ name: "Home" });
         } else {
           return false;
         }
       });
     };
 
-    // TODO watch: has user this.$router.push('/')
-    /**
-     * watch: {
-      user (value) {
-        if (value !== null && value !== undefined) {
-          this.$router.push('/')
-        }
-      }
-    },
-     */
     return {
       signupForm,
       submitForm,
       ruleForm,
       rules,
       loading,
-      user,
     };
   },
 };

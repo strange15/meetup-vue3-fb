@@ -126,6 +126,7 @@ import { useStore } from "vuex";
 
 export default defineComponent({
   setup() {
+    // TODO menuItems 用程式跑, 就可以直接判斷是否為登入狀態
     const store = useStore();
     let drawer = ref(false);
     const user = computed(() => {

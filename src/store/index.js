@@ -4,7 +4,10 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signOut,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
+import { ElMessage } from 'element-plus'
+import router from "../router";
 
 export default createStore({
   state: {
@@ -78,19 +81,39 @@ export default createStore({
             registeredMeetups: [],
           };
           commit("setUser", newUser);
+          router.push("/");
         })
         .catch((error) => {
           commit("setLoading", false);
+          ElMessage.error(error.message);
           console.log(error);
         });
     },
-    // signUserIn ({commit}, payload) {
-    // },
+    signUserIn({ commit }, payload) {
+      commit("setLoading", true);
+      const auth = getAuth();
+      signInWithEmailAndPassword(auth, payload.email, payload.password)
+        .then((user) => {
+          console.log('login!!!!!!');
+          commit("setLoading", false);
+          const newUser = {
+            id: user.uid,
+            registeredMeetups: [],
+          };
+          commit("setUser", newUser);
+          router.push("/");
+        })
+        .catch((error) => {
+          commit("setLoading", false);
+          ElMessage.error(error.message);
+          console.log("signUserIn", error);
+        });
+    },
     autoSignIn({ commit }, payload) {
       commit("setUser", { id: payload.uid, registeredMeetups: [] });
     },
     logout({ commit }) {
-      console.log('logout!!!!!!!');
+      console.log("logout!!!!!!!");
       const auth = getAuth();
       signOut(auth);
       commit("setUser", null);

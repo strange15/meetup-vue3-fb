@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "../views/Home.vue";
+import AuthGuard from "./auth-guard";
 
 const routes = [
   {
@@ -18,6 +19,7 @@ const routes = [
     name: "Organize",
     component: () =>
       import(/* webpackChunkName: "organize" */ "../views/organize.vue"),
+    beforeEnter: AuthGuard,
   },
   {
     path: "/meetups/:id",

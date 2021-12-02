@@ -55,7 +55,7 @@
 <script>
 import { ref } from "vue";
 import { useStore } from "vuex";
-import { ElMessage } from 'element-plus'
+import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 
 export default {
@@ -122,12 +122,12 @@ export default {
         if (valid) {
           store.dispatch("createMeetup", ruleForm);
           ElMessage({
-            message: '新增成功！',
-            type: 'success',
-          })
+            message: "新增成功！",
+            type: "success",
+          });
           setTimeout(() => {
             router.push({ name: "Meetups" });
-          }, 1500)
+          }, 1500);
         } else {
           return false;
         }
@@ -142,7 +142,7 @@ export default {
       submitForm,
       resetForm,
       ruleForm,
-      rules
+      rules,
     };
   },
 };
