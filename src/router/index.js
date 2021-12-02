@@ -20,10 +20,22 @@ const routes = [
       import(/* webpackChunkName: "organize" */ "../views/organize.vue"),
   },
   {
-    path: '/meetups/:id',
-    name: 'Meetup',
+    path: "/meetups/:id",
+    name: "Meetup",
     component: () =>
       import(/* webpackChunkName: "meetup" */ "../views/meetup.vue"),
+  },
+  {
+    path: "/signup",
+    name: "Signup",
+    component: () =>
+      import(/* webpackChunkName: "signup" */ "../views/signup.vue"),
+  },
+  {
+    path: "/signin",
+    name: "Signin",
+    component: () =>
+      import(/* webpackChunkName: "signin" */ "../views/signin.vue"),
   },
 ];
 

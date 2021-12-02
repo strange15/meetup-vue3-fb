@@ -41,6 +41,7 @@
 <script>
 import { mapState } from 'vuex'
 import { useRouter } from "vue-router";
+// import { getAuth } from "firebase/auth";
 
 export default {
   computed: mapState({
@@ -51,6 +52,8 @@ export default {
     const goToMeetup = (id) => {
       router.push({ name: "Meetup", params: { id }});
     }
+    // const auth = getAuth();
+    // console.log("🚀 ~ file: meetups.vue ~ line 56 ~ setup ~ auth", auth)
     return {
       goToMeetup
     }

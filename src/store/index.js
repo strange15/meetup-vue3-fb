@@ -1,96 +1,107 @@
 import { createStore } from "vuex";
 import dayjs from "dayjs";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
 
 export default createStore({
   state: {
     loadedMeetups: [
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/47/New_york_times_square-terabass.jpg',
-        id: 'afajfjadfaadfa323',
-        title: 'Meetup in New York',
+        imageUrl:
+          "https://upload.wikimedia.org/wikipedia/commons/4/47/New_york_times_square-terabass.jpg",
+        id: "afajfjadfaadfa323",
+        title: "Meetup in New York",
         date: dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss"),
-        location: 'New York',
-        description: 'New York, New York!'
+        location: "New York",
+        description: "New York, New York!",
       },
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7a/Paris_-_Blick_vom_gro%C3%9Fen_Triumphbogen.jpg',
-        id: 'aadsfhbkhlk1241',
-        title: 'Meetup in Paris',
+        imageUrl:
+          "https://upload.wikimedia.org/wikipedia/commons/7/7a/Paris_-_Blick_vom_gro%C3%9Fen_Triumphbogen.jpg",
+        id: "aadsfhbkhlk1241",
+        title: "Meetup in Paris",
         date: dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss"),
-        location: 'Paris',
-        description: 'It\'s Paris!'
-      }
+        location: "Paris",
+        description: "It's Paris!",
+      },
     ],
+    user: null,
+    loading: false,
   },
   mutations: {
-    setLoadedMeetups (state, payload) {
-      state.loadedMeetups = payload
+    setLoadedMeetups(state, payload) {
+      state.loadedMeetups = payload;
     },
-    createMeetup (state, payload) {
-      state.loadedMeetups.push(payload)
+    createMeetup(state, payload) {
+      state.loadedMeetups.push(payload);
+    },
+    setLoading(state, payload) {
+      state.loading = payload;
+    },
+    setUser(state, payload) {
+      state.user = payload;
     },
   },
   actions: {
     // loadMeetups ({commit}) {
+
     // },
-    createMeetup ({commit}, payload) {
-      let date1 = dayjs(payload.date1).format("YYYY-MM-DD")
-      let date2 = dayjs(payload.date2).format("HH:mm:ss")
+    createMeetup({ commit }, payload) {
+      let date1 = dayjs(payload.date1).format("YYYY-MM-DD");
+      let date2 = dayjs(payload.date2).format("HH:mm:ss");
       const meetup = {
-        title: payload['value'].title,
-        location: payload['value'].location,
-        imageUrl: payload['value'].imageUrl,
-        description: payload['value'].description,
+        title: payload["value"].title,
+        location: payload["value"].location,
+        imageUrl: payload["value"].imageUrl,
+        description: payload["value"].description,
         date: `${date1} ${date2}`,
         // creatorId: getters.user.id
-        id: Date.now()
-      }
-      commit('createMeetup', { ...meetup})
+        id: Date.now(),
+      };
+      commit("createMeetup", { ...meetup });
     },
-    // initFirebase () {
-    // console.log("🚀 ~ file: index.js ~ line 53 ~ initFirebase ~ initFirebase")
-      
-    //   // For Firebase JavaScript SDK v7.20.0 and later, `measurementId` is an optional field
-    //   const firebaseConfig = {
-    //     apiKey: "AIzaSyBILcyzgqRlTSGwwSD3fq2EJ3hmHdImKC4",
-    //     authDomain: "yt-devmeetup-af81f.firebaseapp.com",
-    //     databaseURL: "https://yt-devmeetup-af81f-default-rtdb.firebaseio.com",
-    //     projectId: "yt-devmeetup-af81f",
-    //     storageBucket: "yt-devmeetup-af81f.appspot.com",
-    //     messagingSenderId: "854561744542",
-    //     appId: "1:854561744542:web:62364b3ca70f59c2ca3d8f",
-    //     measurementId: "G-1S92G7SYMQ"
-    //   };
-
-    //   const app = initializeApp(firebaseConfig);
-    //   console.log("🚀 ~ file: index.js ~ line 66 ~ initFirebase ~ app", app)
-    //   const db = getFirestore(app);
-    //   console.log("🚀 ~ file: index.js ~ line 68 ~ initFirebase ~ db", db)
-
-    //   // // Get a list of cities from your database
-    //   // async function getCities(db) {
-    //   //   const citiesCol = collection(db, 'cities');
-    //   //   const citySnapshot = await getDocs(citiesCol);
-    //   //   const cityList = citySnapshot.docs.map(doc => doc.data());
-    //   //   return cityList;
-    //   // }
-    //   // console.log("🚀 ~ file: index.js ~ line 72 ~ getCities ~ getCities", getCities())
-    // }
-    // signUserUp ({commit}, payload) {
-    // },
+    signUserUp({ commit }, payload) {
+      commit("setLoading", true);
+      const auth = getAuth();
+      createUserWithEmailAndPassword(
+        auth,
+        payload["value"].email,
+        payload["value"].password
+      )
+        .then((user) => {
+          commit("setLoading", false);
+          const newUser = {
+            id: user.uid,
+            registeredMeetups: [],
+          };
+          commit("setUser", newUser);
+        })
+        .catch((error) => {
+          commit("setLoading", false);
+          console.log(error);
+        });
+    },
     // signUserIn ({commit}, payload) {
     // },
-    // autoSignIn ({commit}, payload) {
-    // },
-    // logout ({commit}) {
-    // },
+    autoSignIn({ commit }, payload) {
+      commit("setUser", { id: payload.uid, registeredMeetups: [] });
+    },
+    logout({ commit }) {
+      console.log('logout!!!!!!!');
+      const auth = getAuth();
+      signOut(auth);
+      commit("setUser", null);
+    },
   },
   modules: {},
   getters: {
-    loadedMeetups (state) {
+    loadedMeetups(state) {
       return state.loadedMeetups.sort((meetupA, meetupB) => {
-        return meetupA.date > meetupB.date
-      })
+        return meetupA.date > meetupB.date;
+      });
     },
     // featuredMeetups (state, getters) {
     //   return getters.loadedMeetups.slice(0, 5)
@@ -102,14 +113,14 @@ export default createStore({
     //     })
     //   }
     // },
-    // user (state) {
-    //   return state.user
-    // },
-    // loading (state) {
-    //   return state.loading
-    // },
+    user(state) {
+      return state.user;
+    },
+    loading(state) {
+      return state.loading;
+    },
     // error (state) {
     //   return state.error
     // }
-  }
+  },
 });

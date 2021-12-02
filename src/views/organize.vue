@@ -46,9 +46,7 @@
         <el-input v-model="ruleForm.description" type="textarea"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submitForm()"
-          >CREATE MEETUP</el-button
-        >
+        <el-button type="primary" @click="submitForm()">CREATE</el-button>
         <el-button @click="resetForm()">Reset</el-button>
       </el-form-item>
     </el-form>
@@ -57,11 +55,14 @@
 <script>
 import { ref } from "vue";
 import { useStore } from "vuex";
+import { ElMessage } from 'element-plus'
+import { useRouter } from "vue-router";
 
 export default {
   setup() {
     const meetupForm = ref();
     const store = useStore();
+    const router = useRouter();
     let ruleForm = ref({
       title: "",
       location: "",
@@ -120,7 +121,13 @@ export default {
       meetupForm["value"].validate((valid) => {
         if (valid) {
           store.dispatch("createMeetup", ruleForm);
-          // TODO: go to /meetups after adding success
+          ElMessage({
+            message: '新增成功！',
+            type: 'success',
+          })
+          setTimeout(() => {
+            router.push({ name: "Meetups" });
+          }, 1500)
         } else {
           return false;
         }
