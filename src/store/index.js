@@ -6,6 +6,7 @@ import {
   signOut,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import { getDatabase, ref, child, get, push } from "firebase/database";
 import { ElMessage } from "element-plus";
 import router from "../router";
 
@@ -49,22 +50,59 @@ export default createStore({
     },
   },
   actions: {
-    // loadMeetups ({commit}) {
-
-    // },
+    loadMeetups({ commit }) {
+      commit("setLoading", true);
+      const dbRef = ref(getDatabase());
+      get(child(dbRef, `meetups`))
+        .then((data) => {
+          if (data.exists()) {
+            const meetups = [];
+            const obj = data.val();
+            for (let key in obj) {
+              meetups.push({
+                id: key,
+                title: obj[key].title,
+                description: obj[key].description,
+                imageUrl: obj[key].imageUrl,
+                date: obj[key].date,
+                creatorId: obj[key].creatorId,
+              });
+            }
+            commit("setLoadedMeetups", meetups);
+          } else {
+            console.log("No data available");
+          }
+          commit("setLoading", false);
+        })
+        .catch((error) => {
+          commit("setLoading", false);
+          console.error(error);
+        });
+    },
     createMeetup({ commit }, payload) {
-      let date1 = dayjs(payload.date1).format("YYYY-MM-DD");
-      let date2 = dayjs(payload.date2).format("HH:mm:ss");
+      commit("setLoading", true);
+      let date1 = dayjs(payload["value"].date1).format("YYYY-MM-DD");
+      let date2 = dayjs(payload["value"].date2).format("HH:mm:ss");
       const meetup = {
         title: payload["value"].title,
         location: payload["value"].location,
         imageUrl: payload["value"].imageUrl,
         description: payload["value"].description,
         date: `${date1} ${date2}`,
-        // creatorId: getters.user.id
-        id: Date.now(),
       };
-      commit("createMeetup", { ...meetup });
+      const db = getDatabase();
+
+      push(ref(db, "meetups"), meetup)
+        .then((data) => {
+          commit("setLoading", false);
+          const key = data.key;
+          commit("createMeetup", { ...meetup, id: key });
+          router.push({ name: "Meetups" });
+        })
+        .catch((error) => {
+          commit("setLoading", false);
+          ElMessage.error(error.message);
+        });
     },
     signUserUp({ commit }, payload) {
       commit("setLoading", true);
@@ -86,7 +124,6 @@ export default createStore({
         .catch((error) => {
           commit("setLoading", false);
           ElMessage.error(error.message);
-          console.log(error);
         });
     },
     signUserIn({ commit }, payload) {
@@ -98,7 +135,6 @@ export default createStore({
         payload["value"].password
       )
         .then((user) => {
-          console.log("login!!!!!!");
           commit("setLoading", false);
           const newUser = {
             id: user.uid,
@@ -110,14 +146,12 @@ export default createStore({
         .catch((error) => {
           commit("setLoading", false);
           ElMessage.error(error.message);
-          console.log("signUserIn", error);
         });
     },
     autoSignIn({ commit }, payload) {
       commit("setUser", { id: payload.uid, registeredMeetups: [] });
     },
     logout({ commit }) {
-      console.log("logout!!!!!!!");
       const auth = getAuth();
       signOut(auth);
       commit("setUser", null);
@@ -133,21 +167,11 @@ export default createStore({
     // featuredMeetups (state, getters) {
     //   return getters.loadedMeetups.slice(0, 5)
     // },
-    // loadedMeetup (state) {
-    //   return (meetupId) => {
-    //     return state.loadedMeetups.find((meetup) => {
-    //       return meetup.id === meetupId
-    //     })
-    //   }
-    // },
     user(state) {
       return state.user;
     },
     loading(state) {
       return state.loading;
     },
-    // error (state) {
-    //   return state.error
-    // }
   },
 });

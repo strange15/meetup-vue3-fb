@@ -1,6 +1,16 @@
 <template>
-  <div class="home">
-    <div class="button-container flex flex-col lg:flex-row justify-center items-center mt-8 mb-4">
+  <div class="home" v-loading="loading">
+    <div
+      class="
+        button-container
+        flex flex-col
+        lg:flex-row
+        justify-center
+        items-center
+        mt-8
+        mb-4
+      "
+    >
       <div>
         <router-link to="/meetups">
           <el-button type="primary">EXPLORE MEETUPS</el-button>
@@ -12,8 +22,19 @@
         </router-link>
       </div>
     </div>
-    <el-carousel trigger="click" arrow="always" height="28rem" :interval="5000" class="w-5/6 mx-auto my-0">
-      <el-carousel-item class="relative" v-for="item in loadedMeetups" :key="item">
+    <el-carousel
+      trigger="click"
+      arrow="always"
+      height="28rem"
+      :interval="5000"
+      class="w-5/6 mx-auto my-0"
+      v-if="!loading"
+    >
+      <el-carousel-item
+        class="relative"
+        v-for="item in loadedMeetups"
+        :key="item"
+      >
         <el-image
           class="w-full h-full"
           fit="cover"
@@ -21,7 +42,21 @@
           :src="item.imageUrl"
           @click="goToMeetup(item.id)"
         ></el-image>
-        <div class="absolute bottom-8 left-2/4 transform -translate-x-1/2 text-white bg-black bg-opacity-30 px-4 py-4 w-56 text-center">
+        <div
+          class="
+            absolute
+            bottom-8
+            left-2/4
+            transform
+            -translate-x-1/2
+            text-white
+            bg-black bg-opacity-30
+            px-4
+            py-4
+            w-56
+            text-center
+          "
+        >
           {{ item.title }}
         </div>
       </el-carousel-item>
@@ -32,21 +67,29 @@
 
 <script>
 // @ is an alias to /src
-import { mapState } from 'vuex'
+import { computed } from "vue";
+import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 
 export default {
-  computed: mapState({
-    loadedMeetups: state => state.loadedMeetups,
-  }),
   setup() {
     const router = useRouter();
+    const store = useStore();
+
+    const loadedMeetups = computed(() => {
+      return store.getters.loadedMeetups;
+    });
+    const loading = computed(() => {
+      return store.getters.loading;
+    });
     const goToMeetup = (id) => {
-      router.push({ name: "Meetup", params: { id }});
-    }
+      router.push({ name: "Meetup", params: { id } });
+    };
     return {
-      goToMeetup
-    }
+      goToMeetup,
+      loading,
+      loadedMeetups,
+    };
   },
-}
+};
 </script>

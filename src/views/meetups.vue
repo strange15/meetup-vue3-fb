@@ -1,7 +1,19 @@
 <template>
   <div class="meetups p-4">
     <div
-      class="w-full bg-blue-500 shadow lg:w-8/12 flex justify-center items-center rounded p-4 mb-4 mx-auto"
+      class="
+        w-full
+        bg-blue-500
+        shadow
+        lg:w-8/12
+        flex
+        justify-center
+        items-center
+        rounded
+        p-4
+        mb-4
+        mx-auto
+      "
       v-for="item in loadedMeetups"
       :key="item.id"
     >
@@ -39,24 +51,23 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
+import { mapState } from "vuex";
 import { useRouter } from "vue-router";
-// import { getAuth } from "firebase/auth";
 
 export default {
   computed: mapState({
-    loadedMeetups: state => state.loadedMeetups,
+    loadedMeetups: (state) => state.loadedMeetups,
   }),
   setup() {
+    // const store = useStore();
     const router = useRouter();
+    // store.dispatch("loadMeetups");
     const goToMeetup = (id) => {
-      router.push({ name: "Meetup", params: { id }});
-    }
-    // const auth = getAuth();
-    // console.log("🚀 ~ file: meetups.vue ~ line 56 ~ setup ~ auth", auth)
+      router.push({ name: "Meetup", params: { id } });
+    };
     return {
-      goToMeetup
-    }
+      goToMeetup,
+    };
   },
 };
 </script>

@@ -10,8 +10,6 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-// import { getFirestore } from "firebase/firestore/lite";
-//import { getDatabase } from "firebase/database";
 
 function initFirebase() {
   // For Firebase JavaScript SDK v7.20.0 and later, `measurementId` is an optional field
@@ -32,20 +30,7 @@ function initFirebase() {
       store.dispatch("autoSignIn", user);
     }
   });
-  // store.dispatch("loadMeetups");
-  // Get a reference to the database service
-  //const database = getDatabase(app);
-  //console.log("🚀 ~ file: main.js ~ line 34 ~ initFirebase ~ database", database)
-  // const db = getFirestore(app);
-
-  // // Get a list of cities from your database
-  // async function getCities(db) {
-  //   const citiesCol = collection(db, 'cities');
-  //   const citySnapshot = await getDocs(citiesCol);
-  //   const cityList = citySnapshot.docs.map(doc => doc.data());
-  //   return cityList;
-  // }
-  // console.log("🚀 ~ file: index.js ~ line 72 ~ getCities ~ getCities", getCities())
+  store.dispatch("loadMeetups");
 }
 initFirebase();
 

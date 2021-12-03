@@ -1,5 +1,5 @@
 <template>
-  <div class="organize p-8">
+  <div class="organize p-8" v-loading="loading">
     <el-form
       ref="meetupForm"
       :model="ruleForm"
@@ -53,16 +53,16 @@
   </div>
 </template>
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useStore } from "vuex";
-import { ElMessage } from "element-plus";
-import { useRouter } from "vue-router";
 
 export default {
   setup() {
     const meetupForm = ref();
+    const loading = computed(() => {
+      return store.getters.loading;
+    });
     const store = useStore();
-    const router = useRouter();
     let ruleForm = ref({
       title: "",
       location: "",
@@ -121,13 +121,6 @@ export default {
       meetupForm["value"].validate((valid) => {
         if (valid) {
           store.dispatch("createMeetup", ruleForm);
-          ElMessage({
-            message: "新增成功！",
-            type: "success",
-          });
-          setTimeout(() => {
-            router.push({ name: "Meetups" });
-          }, 1500);
         } else {
           return false;
         }
@@ -143,6 +136,7 @@ export default {
       resetForm,
       ruleForm,
       rules,
+      loading,
     };
   },
 };
