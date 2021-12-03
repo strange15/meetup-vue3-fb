@@ -33,7 +33,7 @@
   </div>
 </template>
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 
@@ -42,7 +42,9 @@ export default {
     const store = useStore();
     const router = useRouter();
     const signupForm = ref();
-    let loading = store.getters.loading;
+    const loading = computed(() => {
+      return store.getters.loading;
+    });
     onMounted(() => {
       if (store.getters.user) {
         router.push({ name: "Home" });

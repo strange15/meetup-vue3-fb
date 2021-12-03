@@ -6,7 +6,7 @@ import {
   signOut,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { ElMessage } from 'element-plus'
+import { ElMessage } from "element-plus";
 import router from "../router";
 
 export default createStore({
@@ -92,9 +92,13 @@ export default createStore({
     signUserIn({ commit }, payload) {
       commit("setLoading", true);
       const auth = getAuth();
-      signInWithEmailAndPassword(auth, payload.email, payload.password)
+      signInWithEmailAndPassword(
+        auth,
+        payload["value"].email,
+        payload["value"].password
+      )
         .then((user) => {
-          console.log('login!!!!!!');
+          console.log("login!!!!!!");
           commit("setLoading", false);
           const newUser = {
             id: user.uid,

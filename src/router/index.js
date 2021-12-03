@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "../views/Home.vue";
 import AuthGuard from "./auth-guard";
+import PathNotFound from "../views/notFound.vue";
 
 const routes = [
   {
@@ -39,6 +40,7 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "signin" */ "../views/signin.vue"),
   },
+  { path: "/:pathMatch(.*)*", component: PathNotFound },
 ];
 
 const router = createRouter({
