@@ -28,5 +28,3 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ```
 npm run serve -- --port XXXX
 ```
-
-# try Ubuntu
