@@ -15,40 +15,13 @@
     </div>
     <div class="hidden justify-between items-center nav lg:flex">
       <router-link
-        to="/meetups"
+        v-for="menu in menuItems"
+        :key="menu.text"
+        :to="menu.path"
         class="flex justify-start items-center ml-6 cursor-pointer text-sm"
-        v-show="user"
       >
-        <font-awesome-icon class="icon" :icon="['fas', 'user-friends']" />
-        <span class="nav-item ml-4">VIEW MEETUPS</span>
-      </router-link>
-      <router-link
-        to="/meetup/new"
-        class="flex justify-start items-center ml-6 cursor-pointer text-sm"
-        v-show="user"
-      >
-        <font-awesome-icon class="icon" :icon="['fas', 'map-marker-alt']" />
-        <span class="nav-item ml-4">ORGANIZE MEETUP</span>
-      </router-link>
-      <!-- <div class="flex justify-start items-center ml-6 cursor-pointer text-sm">
-        <font-awesome-icon class="icon" :icon="['fas', 'user']" />
-        <span class="nav-item ml-4">PROFILE</span>
-      </div> -->
-      <router-link
-        to="/signup"
-        class="flex justify-start items-center ml-6 cursor-pointer text-sm"
-        v-show="!user"
-      >
-        <font-awesome-icon class="icon" :icon="['fas', 'user-plus']" />
-        <span class="nav-item ml-4">SIGN UP</span>
-      </router-link>
-      <router-link
-        to="/signin"
-        class="flex justify-start items-center ml-6 cursor-pointer text-sm"
-        v-show="!user"
-      >
-        <font-awesome-icon class="icon" :icon="['fas', 'sign-in-alt']" />
-        <span class="nav-item ml-4">SIGN IN</span>
+        <font-awesome-icon class="icon" :icon="['fas', menu.icon]" />
+        <span class="nav-item ml-4">{{ menu.text }}</span>
       </router-link>
       <div
         class="flex justify-start items-center ml-6 cursor-pointer text-sm"
@@ -68,44 +41,14 @@
     >
       <div class="text-black flex flex-col justify-start items-start p-4">
         <router-link
-          to="/meetups"
+          v-for="menu in menuItems"
+          :key="menu.text"
+          :to="menu.path"
           @click="drawer = false"
           class="w-full flex justify-start items-center p-2 mb-2"
-          v-show="user"
-        >
-          <font-awesome-icon class="icon" :icon="['fas', 'user-friends']" />
-          <span class="ml-8">View Meetups</span>
-        </router-link>
-        <router-link
-          to="/meetup/new"
-          @click="drawer = false"
-          class="w-full flex justify-start items-center p-2 mb-2"
-          v-show="user"
-        >
-          <font-awesome-icon class="icon" :icon="['fas', 'map-marker-alt']" />
-          <span class="ml-8">Organize Meetup</span>
-        </router-link>
-        <!-- <div class="w-full flex justify-start items-center p-2 mb-2">
-          <font-awesome-icon class="icon" :icon="['fas', 'user']" />
-          <span class="ml-8">Profile</span>
-        </div> -->
-        <router-link
-          to="/signup"
-          @click="drawer = false"
-          class="w-full flex justify-start items-center p-2 mb-2"
-          v-show="!user"
         >
           <font-awesome-icon class="icon" :icon="['fas', 'user-plus']" />
-          <span class="ml-8">Sign up</span>
-        </router-link>
-        <router-link
-          to="/signin"
-          @click="drawer = false"
-          class="w-full flex justify-start items-center p-2 mb-2"
-          v-show="!user"
-        >
-          <font-awesome-icon class="icon" :icon="['fas', 'sign-in-alt']" />
-          <span class="ml-8">Sign in</span>
+          <span class="ml-8">{{ menu.text }}</span>
         </router-link>
         <div
           @click="logout()"
@@ -126,14 +69,42 @@ import { useStore } from "vuex";
 
 export default defineComponent({
   setup() {
-    // TODO menuItems 用程式跑, 就可以直接判斷是否為登入狀態
     const store = useStore();
     let drawer = ref(false);
     const user = computed(() => {
       return store.getters.user;
     });
+    const menuItems = computed(() => {
+      let menuItems = [
+        {
+          text: "SIGN IN",
+          icon: "sign-in-alt",
+          path: "/signin",
+        },
+        {
+          text: "SIGN UP",
+          icon: "user-plus",
+          path: "/signup",
+        },
+      ];
+      if (user.value) {
+        menuItems = [
+          {
+            text: "VIEW MEETUPS",
+            icon: "user-friends",
+            path: "/meetups",
+          },
+          {
+            text: "ORGANIZE MEETUP",
+            icon: "map-marker-alt",
+            path: "/meetup/new",
+          },
+        ];
+      }
+      return menuItems;
+    });
     const logout = () => {
-      drawer = false;
+      drawer.value = false;
       store.dispatch("logout");
     };
     return {
@@ -141,6 +112,7 @@ export default defineComponent({
       direction: "ltr",
       user,
       logout,
+      menuItems,
     };
   },
 });

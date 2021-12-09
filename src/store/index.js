@@ -155,6 +155,7 @@ export default createStore({
       const auth = getAuth();
       signOut(auth);
       commit("setUser", null);
+      router.push("/");
     },
   },
   modules: {},
