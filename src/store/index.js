@@ -6,7 +6,7 @@ import {
   signOut,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { getDatabase, ref, child, get, push } from "firebase/database";
+import { getDatabase, ref, child, get, push, update } from "firebase/database";
 import { ElMessage } from "element-plus";
 import router from "../router";
 
@@ -41,6 +41,20 @@ export default createStore({
     },
     createMeetup(state, payload) {
       state.loadedMeetups.push(payload);
+    },
+    updateMeetupData(state, payload) {
+      const meetup = state.loadedMeetups.find((meetup) => {
+        return meetup.id === payload.id;
+      });
+      if (payload.title) {
+        meetup.title = payload.title;
+      }
+      if (payload.description) {
+        meetup.description = payload.description;
+      }
+      if (payload.date) {
+        meetup.date = payload.date;
+      }
     },
     setLoading(state, payload) {
       state.loading = payload;
@@ -103,6 +117,63 @@ export default createStore({
         .catch((error) => {
           commit("setLoading", false);
           ElMessage.error(error.message);
+        });
+    },
+    updateMeetupData({ commit }, payload) {
+      console.log(
+        "🚀 ~ file: index.js ~ line 109 ~ updateMeetupData ~ payload",
+        payload
+      );
+      commit("setLoading", true);
+
+      // let date1 = dayjs(payload["value"].date1).format("YYYY-MM-DD");
+      // let date2 = dayjs(payload["value"].date2).format("HH:mm:ss");
+      // const meetup = {
+      //   title: payload["value"].title,
+      //   location: payload["value"].location,
+      //   imageUrl: payload["value"].imageUrl,
+      //   description: payload["value"].description,
+      //   date: `${date1} ${date2}`,
+      // };
+      // const db = getDatabase();
+
+      // push(ref(db, "meetups"), meetup)
+      //   .then((data) => {
+      //     commit("setLoading", false);
+      //     const key = data.key;
+      //     commit("createMeetup", { ...meetup, id: key });
+      //     router.push({ name: "Meetups" });
+      //   })
+      //   .catch((error) => {
+      //     commit("setLoading", false);
+      //     ElMessage.error(error.message);
+      //   });
+
+      const db = getDatabase();
+      const updateObj = {};
+      if (payload.title) {
+        updateObj.title = payload.title;
+      }
+      if (payload.description) {
+        updateObj.description = payload.description;
+      }
+      updateObj.date = dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss");
+
+      // Get a key for a new Post.
+      const newPostKey = push(child(ref(db), "posts")).key;
+
+      // Write the new post's data simultaneously in the posts list and the user's post list.
+      const updates = {};
+      updates["/meetups/" + newPostKey] = updateObj;
+      update(ref(db), updates)
+        .then((res) => {
+          console.log("🚀 ~ file: index.js ~ line 155 ~ update ~ res", res);
+          commit("setLoading", false);
+          commit("updateMeetup", payload);
+        })
+        .catch((error) => {
+          console.log("🚀 ~ file: index.js ~ line 157 ~ update ~ error", error);
+          commit("setLoading", false);
         });
     },
     signUserUp({ commit }, payload) {
