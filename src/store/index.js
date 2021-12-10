@@ -79,6 +79,7 @@ export default createStore({
                 description: obj[key].description,
                 imageUrl: obj[key].imageUrl,
                 date: obj[key].date,
+                location: obj[key].location,
                 creatorId: obj[key].creatorId,
               });
             }

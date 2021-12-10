@@ -1,6 +1,6 @@
 <template>
   <div class="meetup p-4">
-    <div class="container shadow py-4 my-0 mx-auto">
+    <div class="container shadow py-4 my-0 mx-auto" v-if="meetup">
       <div class="title p-4 text-red-600 text-2xl mb-4">{{ meetup.title }}</div>
       <div
         class="w-full h-96"
@@ -16,6 +16,9 @@
         <!-- TODO -->
         <el-button type="danger">REGISTER</el-button>
       </div>
+    </div>
+    <div v-else>
+      <h1>資料有誤, 將回到首頁</h1>
     </div>
     <el-button type="text" @click="dialogFormVisible = true"
       >open a Form nested Dialog</el-button
@@ -47,7 +50,7 @@
 <script>
 import { reactive, toRefs } from "vue";
 import { useStore } from "vuex";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 export default {
   setup() {
@@ -66,7 +69,18 @@ export default {
       formLabelWidth: "120px",
     });
     const route = useRoute();
+    const router = useRouter();
     const store = useStore();
+    let loadedMeetups = store.state.loadedMeetups;
+    let hasMatch = false;
+    hasMatch = loadedMeetups.find((item) => {
+      return item.id === route.params.id;
+    });
+    if (!hasMatch) {
+      setTimeout(() => {
+        router.push("/");
+      }, 2000);
+    }
     let meetup;
     meetup = store.state.loadedMeetups.find((item) => {
       return item.id === route.params.id;
