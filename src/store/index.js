@@ -152,14 +152,14 @@ export default createStore({
         payload["value"].email,
         payload["value"].password
       )
-        .then((user) => {
+        .then((res) => {
           commit("setLoading", false);
           const newUser = {
-            id: user.uid,
+            id: res.user.uid,
             registeredMeetups: [],
           };
           commit("setUser", newUser);
-          localStorage.setItem("uid", user.uid);
+          localStorage.setItem("uid", res.user.uid);
           router.push("/");
         })
         .catch((error) => {
@@ -175,14 +175,14 @@ export default createStore({
         payload["value"].email,
         payload["value"].password
       )
-        .then((user) => {
+        .then((res) => {
           commit("setLoading", false);
           const newUser = {
-            id: user.uid,
+            id: res.user.uid,
             registeredMeetups: [],
           };
           commit("setUser", newUser);
-          localStorage.setItem("uid", user.uid);
+          localStorage.setItem("uid", res.user.uid);
           router.push("/");
         })
         .catch((error) => {
@@ -198,7 +198,7 @@ export default createStore({
       const auth = getAuth();
       signOut(auth);
       commit("setUser", null);
-      localStorage.setItem("uid", "");
+      localStorage.removeItem("uid");
       router.push("/");
     },
   },
