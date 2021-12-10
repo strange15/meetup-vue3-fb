@@ -47,8 +47,8 @@
 <script>
 import { reactive, toRefs } from "vue";
 import { useStore } from "vuex";
-import { useRoute, useRouter } from "vue-router";
-import { ElMessage } from "element-plus";
+import { useRoute } from "vue-router";
+
 export default {
   setup() {
     const state = reactive({
@@ -67,33 +67,10 @@ export default {
     });
     const route = useRoute();
     const store = useStore();
-    const router = useRouter();
     let meetup;
-    let loadedMeetups = store.state.loadedMeetups;
-    let hasMatch = false;
-    hasMatch = loadedMeetups.find((item) => {
+    meetup = store.state.loadedMeetups.find((item) => {
       return item.id === route.params.id;
     });
-    if (!hasMatch) {
-      ElMessage.error("資料有誤！");
-      meetup = {
-        imageUrl:
-          "https://upload.wikimedia.org/wikipedia/commons/4/47/New_york_times_square-terabass.jpg",
-        id: "afajfjadfaadfa323",
-        title: "Meetup in New York",
-        date: "....",
-        location: "New York",
-        description: "New York, New York!",
-      };
-
-      setTimeout(() => {
-        router.push("/");
-      }, 2000);
-    } else {
-      meetup = store.state.loadedMeetups.find((item) => {
-        return item.id === route.params.id;
-      });
-    }
 
     return {
       meetup,
