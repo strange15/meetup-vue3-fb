@@ -34,7 +34,7 @@
         class="relative"
         v-for="item in loadedMeetups"
         :key="item"
-        @click="goToMeetup(item.id)"
+        @click="goToMeetup(item.id, item.creatorId)"
       >
         <el-image
           class="w-full h-full"
@@ -82,8 +82,9 @@ export default {
     const loading = computed(() => {
       return store.getters.loading;
     });
-    const goToMeetup = (id) => {
-      router.push({ name: "Meetup", params: { id } });
+    const goToMeetup = (id, creatorId) => {
+      const isTheSameUser = localStorage.getItem("uid") === creatorId;
+      router.push({ name: "Meetup", params: { id }, query: { isTheSameUser } });
     };
     return {
       goToMeetup,

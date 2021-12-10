@@ -82,23 +82,23 @@ export default {
 
     const meetupForm = ref();
     let ruleForm = reactive({
-      title: "",
+      title: meetup.title,
       location: "",
       imageUrl: "",
-      description: "",
+      description: meetup.description,
       creatorId: "",
     });
     let rules = ref({
       title: [
         {
-          required: false,
+          required: true,
           message: "請輸入標題",
           trigger: "blur",
         },
       ],
       description: [
         {
-          required: false,
+          required: true,
           message: "請輸入描述",
           trigger: "blur",
         },
@@ -119,11 +119,11 @@ export default {
           }
           store.dispatch("updateMeetupData", ruleForm);
           meetupForm["value"].resetFields();
+          dialogFormVisible.value = false;
         } else {
           return false;
         }
       });
-      dialogFormVisible.value = false;
     };
 
     return {
