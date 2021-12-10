@@ -34,13 +34,13 @@
         class="relative"
         v-for="item in loadedMeetups"
         :key="item"
+        @click="goToMeetup(item.id)"
       >
         <el-image
           class="w-full h-full"
           fit="cover"
           :key="item.id"
           :src="item.imageUrl"
-          @click="goToMeetup(item.id)"
         ></el-image>
         <div
           class="

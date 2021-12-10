@@ -1,7 +1,15 @@
 <template>
-  <div class="meetup p-4">
+  <div class="meetup p-4" v-loading="loading">
     <div class="container shadow py-4 my-0 mx-auto" v-if="meetup">
-      <div class="title p-4 text-red-600 text-2xl mb-4">{{ meetup.title }}</div>
+      <div class="flex justify-between items-center mb-4 px-6">
+        <div class="title py-4 text-red-600 text-2xl">{{ meetup.title }}</div>
+        <font-awesome-icon
+          v-show="canEdit"
+          class="cursor-pointer fa-2x"
+          :icon="['fas', 'edit']"
+          @click="dialogFormVisible = true"
+        />
+      </div>
       <div
         class="w-full h-96"
         :style="{
@@ -20,75 +28,113 @@
     <div v-else>
       <h1>資料有誤, 將回到首頁</h1>
     </div>
-    <el-button type="text" @click="dialogFormVisible = true"
-      >open a Form nested Dialog</el-button
-    >
 
-    <el-dialog v-model="dialogFormVisible" title="Shipping address">
-      <el-form :model="form">
-        <el-form-item label="Promotion name" :label-width="formLabelWidth">
-          <el-input v-model="form.name" autocomplete="off"></el-input>
+    <el-dialog v-model="dialogFormVisible" title="Edit Meetup">
+      <el-form
+        ref="meetupForm"
+        :model="ruleForm"
+        :rules="rules"
+        label-width="120px"
+      >
+        <el-form-item label="title" prop="title">
+          <el-input v-model="ruleForm.title"></el-input>
         </el-form-item>
-        <el-form-item label="Zones" :label-width="formLabelWidth">
-          <el-select v-model="form.region" placeholder="Please select a zone">
-            <el-option label="Zone No.1" value="shanghai"></el-option>
-            <el-option label="Zone No.2" value="beijing"></el-option>
-          </el-select>
+        <el-form-item label="description" prop="description">
+          <el-input v-model="ruleForm.description" type="textarea"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm()">UPDATE</el-button>
+          <el-button @click="dialogFormVisible = false">CANCEL</el-button>
         </el-form-item>
       </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="dialogFormVisible = false"
-            >Confirm</el-button
-          >
-        </span>
-      </template>
     </el-dialog>
   </div>
 </template>
 <script>
-import { reactive, toRefs } from "vue";
+import { ref, reactive, computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 
 export default {
   setup() {
-    const state = reactive({
-      dialogFormVisible: false,
-      form: {
-        name: "",
-        region: "",
-        date1: "",
-        date2: "",
-        delivery: false,
-        type: [],
-        resource: "",
-        desc: "",
-      },
-      formLabelWidth: "120px",
-    });
+    let dialogFormVisible = ref(false);
     const route = useRoute();
     const router = useRouter();
     const store = useStore();
+    const loading = computed(() => {
+      return store.getters.loading;
+    });
     let loadedMeetups = store.state.loadedMeetups;
     let hasMatch = false;
     hasMatch = loadedMeetups.find((item) => {
       return item.id === route.params.id;
     });
+    const canEdit = route.query.isTheSameUser === "true";
     if (!hasMatch) {
       setTimeout(() => {
         router.push("/");
       }, 2000);
     }
     let meetup;
-    meetup = store.state.loadedMeetups.find((item) => {
+    meetup = store.getters.loadedMeetups.find((item) => {
       return item.id === route.params.id;
     });
 
+    const meetupForm = ref();
+    let ruleForm = reactive({
+      title: "",
+      location: "",
+      imageUrl: "",
+      description: "",
+      creatorId: "",
+    });
+    let rules = ref({
+      title: [
+        {
+          required: false,
+          message: "請輸入標題",
+          trigger: "blur",
+        },
+      ],
+      description: [
+        {
+          required: false,
+          message: "請輸入描述",
+          trigger: "blur",
+        },
+      ],
+    });
+    const submitForm = () => {
+      meetupForm["value"].validate((valid) => {
+        if (valid) {
+          ruleForm.id = route.params.id;
+          ruleForm.location = meetup.location;
+          ruleForm.imageUrl = meetup.imageUrl;
+          ruleForm.creatorId = meetup.creatorId;
+          if (!ruleForm.title) {
+            ruleForm.title = meetup.title;
+          }
+          if (!ruleForm.description) {
+            ruleForm.description = meetup.description;
+          }
+          store.dispatch("updateMeetupData", ruleForm);
+          meetupForm["value"].resetFields();
+        } else {
+          return false;
+        }
+      });
+      dialogFormVisible.value = false;
+    };
+
     return {
       meetup,
-      ...toRefs(state),
+      dialogFormVisible,
+      meetupForm,
+      submitForm,
+      ruleForm,
+      rules,
+      canEdit,
+      loading,
     };
   },
 };

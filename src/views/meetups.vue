@@ -41,7 +41,7 @@
             transform
             hover:scale-110
           "
-          @click="goToMeetup(item.id)"
+          @click="goToMeetup(item.id, item.creatorId)"
         >
           <font-awesome-icon class="icon ml-4" :icon="['fas', 'arrow-right']" />
           <span class="ml-4">VIEW MEETUP</span>
@@ -59,11 +59,10 @@ export default {
     loadedMeetups: (state) => state.loadedMeetups,
   }),
   setup() {
-    // const store = useStore();
     const router = useRouter();
-    // store.dispatch("loadMeetups");
-    const goToMeetup = (id) => {
-      router.push({ name: "Meetup", params: { id } });
+    const goToMeetup = (id, creatorId) => {
+      const isTheSameUser = localStorage.getItem("uid") === creatorId;
+      router.push({ name: "Meetup", params: { id }, query: { isTheSameUser } });
     };
     return {
       goToMeetup,

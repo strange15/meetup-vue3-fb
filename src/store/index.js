@@ -43,18 +43,15 @@ export default createStore({
       state.loadedMeetups.push(payload);
     },
     updateMeetupData(state, payload) {
-      const meetup = state.loadedMeetups.find((meetup) => {
-        return meetup.id === payload.id;
+      const meetups = state.loadedMeetups.map((meetup) => {
+        if (meetup.id === payload.id) {
+          meetup.title = payload.obj.title;
+          meetup.description = payload.obj.description;
+          meetup.date = payload.obj.date;
+        }
+        return meetup;
       });
-      if (payload.title) {
-        meetup.title = payload.title;
-      }
-      if (payload.description) {
-        meetup.description = payload.description;
-      }
-      if (payload.date) {
-        meetup.date = payload.date;
-      }
+      state.loadedMeetups = meetups;
     },
     setLoading(state, payload) {
       state.loading = payload;
@@ -94,7 +91,7 @@ export default createStore({
           console.error(error);
         });
     },
-    createMeetup({ commit }, payload) {
+    createMeetup({ commit, getters }, payload) {
       commit("setLoading", true);
       let date1 = dayjs(payload["value"].date1).format("YYYY-MM-DD");
       let date2 = dayjs(payload["value"].date2).format("HH:mm:ss");
@@ -104,6 +101,7 @@ export default createStore({
         imageUrl: payload["value"].imageUrl,
         description: payload["value"].description,
         date: `${date1} ${date2}`,
+        creatorId: getters.user.id,
       };
       const db = getDatabase();
 
@@ -120,34 +118,7 @@ export default createStore({
         });
     },
     updateMeetupData({ commit }, payload) {
-      console.log(
-        "🚀 ~ file: index.js ~ line 109 ~ updateMeetupData ~ payload",
-        payload
-      );
       commit("setLoading", true);
-
-      // let date1 = dayjs(payload["value"].date1).format("YYYY-MM-DD");
-      // let date2 = dayjs(payload["value"].date2).format("HH:mm:ss");
-      // const meetup = {
-      //   title: payload["value"].title,
-      //   location: payload["value"].location,
-      //   imageUrl: payload["value"].imageUrl,
-      //   description: payload["value"].description,
-      //   date: `${date1} ${date2}`,
-      // };
-      // const db = getDatabase();
-
-      // push(ref(db, "meetups"), meetup)
-      //   .then((data) => {
-      //     commit("setLoading", false);
-      //     const key = data.key;
-      //     commit("createMeetup", { ...meetup, id: key });
-      //     router.push({ name: "Meetups" });
-      //   })
-      //   .catch((error) => {
-      //     commit("setLoading", false);
-      //     ElMessage.error(error.message);
-      //   });
 
       const db = getDatabase();
       const updateObj = {};
@@ -158,18 +129,15 @@ export default createStore({
         updateObj.description = payload.description;
       }
       updateObj.date = dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss");
-
-      // Get a key for a new Post.
-      const newPostKey = push(child(ref(db), "posts")).key;
-
-      // Write the new post's data simultaneously in the posts list and the user's post list.
+      updateObj.imageUrl = payload.imageUrl;
+      updateObj.location = payload.location;
+      updateObj.creatorId = payload.creatorId;
       const updates = {};
-      updates["/meetups/" + newPostKey] = updateObj;
+      updates["/meetups/" + payload.id] = updateObj;
       update(ref(db), updates)
-        .then((res) => {
-          console.log("🚀 ~ file: index.js ~ line 155 ~ update ~ res", res);
+        .then(() => {
           commit("setLoading", false);
-          commit("updateMeetup", payload);
+          commit("updateMeetupData", { obj: updateObj, id: payload.id });
         })
         .catch((error) => {
           console.log("🚀 ~ file: index.js ~ line 157 ~ update ~ error", error);
@@ -191,6 +159,7 @@ export default createStore({
             registeredMeetups: [],
           };
           commit("setUser", newUser);
+          localStorage.setItem("uid", user.uid);
           router.push("/");
         })
         .catch((error) => {
@@ -213,6 +182,7 @@ export default createStore({
             registeredMeetups: [],
           };
           commit("setUser", newUser);
+          localStorage.setItem("uid", user.uid);
           router.push("/");
         })
         .catch((error) => {
@@ -222,11 +192,13 @@ export default createStore({
     },
     autoSignIn({ commit }, payload) {
       commit("setUser", { id: payload.uid, registeredMeetups: [] });
+      localStorage.setItem("uid", payload.uid);
     },
     logout({ commit }) {
       const auth = getAuth();
       signOut(auth);
       commit("setUser", null);
+      localStorage.setItem("uid", "");
       router.push("/");
     },
   },
