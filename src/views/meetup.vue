@@ -1,6 +1,6 @@
 <template>
   <div class="meetup p-4" v-loading="loading">
-    <div class="container shadow py-4 my-0 mx-auto" v-if="meetup">
+    <div class="container shadow py-4 my-0 mx-auto">
       <div class="flex justify-between items-center mb-4 px-6">
         <div class="title py-4 text-red-600 text-2xl">{{ meetup.title }}</div>
         <font-awesome-icon
@@ -27,9 +27,6 @@
         <!-- TODO -->
         <el-button type="danger">REGISTER</el-button>
       </div>
-    </div>
-    <div v-else>
-      <h1>資料有誤, 將回到首頁</h1>
     </div>
 
     <el-dialog v-model="dialogFormVisible" title="Edit Meetup">
@@ -95,41 +92,31 @@
 <script>
 import { ref, reactive, computed } from "vue";
 import { useStore } from "vuex";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 
 export default {
   setup() {
     let dialogFormVisible = ref(false);
     let dialogDateFormVisible = ref(false);
     const route = useRoute();
-    const router = useRouter();
     const store = useStore();
     const loading = computed(() => {
       return store.getters.loading;
     });
-    let loadedMeetups = store.state.loadedMeetups;
-    let hasMatch = false;
-    hasMatch = loadedMeetups.find((item) => {
-      return item.id === route.params.id;
-    });
     const canEdit = route.query.isTheSameUser === "true";
-    if (!hasMatch) {
-      setTimeout(() => {
-        router.push("/");
-      }, 2000);
-    }
-    let meetup;
-    meetup = store.getters.loadedMeetups.find((item) => {
-      return item.id === route.params.id;
+    let meetup = computed(() => {
+      return store.getters.loadedMeetups.find((item) => {
+        return item.id === route.params.id;
+      });
     });
 
     const meetupForm = ref();
     const meetupDateForm = ref();
     let ruleForm = reactive({
-      title: meetup.title,
+      title: "",
       location: "",
       imageUrl: "",
-      description: meetup.description,
+      description: "",
       creatorId: "",
     });
     let ruleDateForm = reactive({
@@ -174,14 +161,14 @@ export default {
       meetupForm["value"].validate((valid) => {
         if (valid) {
           ruleForm.id = route.params.id;
-          ruleForm.location = meetup.location;
-          ruleForm.imageUrl = meetup.imageUrl;
-          ruleForm.creatorId = meetup.creatorId;
+          ruleForm.location = meetup["value"].location;
+          ruleForm.imageUrl = meetup["value"].imageUrl;
+          ruleForm.creatorId = meetup["value"].creatorId;
           if (!ruleForm.title) {
-            ruleForm.title = meetup.title;
+            ruleForm.title = meetup["value"].title;
           }
           if (!ruleForm.description) {
-            ruleForm.description = meetup.description;
+            ruleForm.description = meetup["value"].description;
           }
           store.dispatch("updateMeetupData", ruleForm);
           meetupForm["value"].resetFields();
@@ -195,11 +182,11 @@ export default {
       meetupDateForm["value"].validate((valid) => {
         if (valid) {
           ruleDateForm.id = route.params.id;
-          ruleDateForm.location = meetup.location;
-          ruleDateForm.imageUrl = meetup.imageUrl;
-          ruleDateForm.creatorId = meetup.creatorId;
-          ruleDateForm.title = meetup.title;
-          ruleDateForm.description = meetup.description;
+          ruleDateForm.location = meetup["value"].location;
+          ruleDateForm.imageUrl = meetup["value"].imageUrl;
+          ruleDateForm.creatorId = meetup["value"].creatorId;
+          ruleDateForm.title = meetup["value"].title;
+          ruleDateForm.description = meetup["value"].description;
           store.dispatch("updateMeetupData", ruleDateForm);
           meetupDateForm["value"].resetFields();
           dialogDateFormVisible.value = false;
