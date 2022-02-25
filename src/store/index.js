@@ -128,7 +128,13 @@ export default createStore({
       if (payload.description) {
         updateObj.description = payload.description;
       }
-      updateObj.date = dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss");
+      if (payload.date1) {
+        let date1 = dayjs(payload.date1).format("YYYY-MM-DD");
+        let date2 = dayjs(payload.date2).format("HH:mm:ss");
+        updateObj.date = `${date1} ${date2}`;
+      } else {
+        updateObj.date = dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss");
+      }
       updateObj.imageUrl = payload.imageUrl;
       updateObj.location = payload.location;
       updateObj.creatorId = payload.creatorId;

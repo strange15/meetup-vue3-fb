@@ -19,6 +19,9 @@
       <div class="px-3 mt-2 text-blue-300 text-sm">
         {{ meetup.date }} - {{ meetup.location }}
       </div>
+      <div class="w-full flex my-4 pl-4">
+        <el-button @click="dialogDateFormVisible = true" type="primary">EDIT DATE AND TIME</el-button>
+      </div>
       <div class="px-3 text-sm">{{ meetup.description }}</div>
       <div class="w-full flex justify-end pr-4">
         <!-- TODO -->
@@ -48,6 +51,45 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+
+    <el-dialog
+      v-model="dialogDateFormVisible"
+      title="Edit Meetup Date And Time"
+    >
+      <el-form
+        ref="meetupDateForm"
+        :model="ruleDateForm"
+        :rules="rulesDate"
+        label-width="120px"
+      >
+        <el-form-item label="Date" required>
+          <el-col :span="11">
+            <el-form-item prop="date1">
+              <el-date-picker
+                v-model="ruleDateForm.date1"
+                type="date"
+                placeholder="請選擇日期"
+                style="width: 100%"
+              ></el-date-picker>
+            </el-form-item>
+          </el-col>
+          <el-col class="line" :span="2">-</el-col>
+          <el-col :span="11">
+            <el-form-item prop="date2">
+              <el-time-picker
+                v-model="ruleDateForm.date2"
+                placeholder="請選擇時間"
+                style="width: 100%"
+              ></el-time-picker>
+            </el-form-item>
+          </el-col>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitDateForm()">UPDATE</el-button>
+          <el-button @click="dialogDateFormVisible = false">CANCEL</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -58,6 +100,7 @@ import { useRoute, useRouter } from "vue-router";
 export default {
   setup() {
     let dialogFormVisible = ref(false);
+    let dialogDateFormVisible = ref(false);
     const route = useRoute();
     const router = useRouter();
     const store = useStore();
@@ -81,12 +124,17 @@ export default {
     });
 
     const meetupForm = ref();
+    const meetupDateForm = ref();
     let ruleForm = reactive({
       title: meetup.title,
       location: "",
       imageUrl: "",
       description: meetup.description,
       creatorId: "",
+    });
+    let ruleDateForm = reactive({
+      date1: "",
+      date2: "",
     });
     let rules = ref({
       title: [
@@ -101,6 +149,24 @@ export default {
           required: true,
           message: "請輸入描述",
           trigger: "blur",
+        },
+      ],
+    });
+    let rulesDate = ref({
+      date1: [
+        {
+          type: "date",
+          required: true,
+          message: "請選擇日期",
+          trigger: "change",
+        },
+      ],
+      date2: [
+        {
+          type: "date",
+          required: true,
+          message: "請選擇時間",
+          trigger: "change",
         },
       ],
     });
@@ -125,14 +191,36 @@ export default {
         }
       });
     };
+    const submitDateForm = () => {
+      meetupDateForm["value"].validate((valid) => {
+        if (valid) {
+          ruleDateForm.id = route.params.id;
+          ruleDateForm.location = meetup.location;
+          ruleDateForm.imageUrl = meetup.imageUrl;
+          ruleDateForm.creatorId = meetup.creatorId;
+          ruleDateForm.title = meetup.title;
+          ruleDateForm.description = meetup.description;
+          store.dispatch("updateMeetupData", ruleDateForm);
+          meetupDateForm["value"].resetFields();
+          dialogDateFormVisible.value = false;
+        } else {
+          return false;
+        }
+      });
+    };
 
     return {
       meetup,
       dialogFormVisible,
+      dialogDateFormVisible,
       meetupForm,
+      meetupDateForm,
       submitForm,
+      submitDateForm,
       ruleForm,
+      ruleDateForm,
       rules,
+      rulesDate,
       canEdit,
       loading,
     };
