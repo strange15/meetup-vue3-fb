@@ -2,7 +2,7 @@
   <div class="meetup p-4" v-loading="loading">
     <div class="container shadow py-4 my-0 mx-auto">
       <div class="flex justify-between items-center mb-4 px-6">
-        <div class="title py-4 text-red-600 text-2xl">{{ meetup.title }}</div>
+        <div class="title py-4 text-red-600 text-2xl">{{ meetup?.title }}</div>
         <font-awesome-icon
           v-show="canEdit"
           class="cursor-pointer fa-2x"
@@ -13,16 +13,16 @@
       <div
         class="w-full h-96"
         :style="{
-          background: `url(${meetup.imageUrl}) center / cover no-repeat`,
+          background: `url(${meetup?.imageUrl}) center / cover no-repeat`,
         }"
       ></div>
       <div class="px-3 mt-2 text-blue-300 text-sm">
-        {{ meetup.date }} - {{ meetup.location }}
+        {{ meetup?.date }} - {{ meetup?.location }}
       </div>
       <div class="w-full flex my-4 pl-4">
         <el-button @click="dialogDateFormVisible = true" type="primary">EDIT DATE AND TIME</el-button>
       </div>
-      <div class="px-3 text-sm">{{ meetup.description }}</div>
+      <div class="px-3 text-sm">{{ meetup?.description }}</div>
       <div class="w-full flex justify-end pr-4">
         <!-- TODO -->
         <el-button type="danger">REGISTER</el-button>
@@ -103,11 +103,13 @@ export default {
     const loading = computed(() => {
       return store.getters.loading;
     });
-    const canEdit = route.query.isTheSameUser === "true";
     let meetup = computed(() => {
       return store.getters.loadedMeetups.find((item) => {
         return item.id === route.params.id;
       });
+    });
+    let canEdit = computed(() => {
+      return localStorage.getItem("uid") === meetup.value?.creatorId;
     });
 
     const meetupForm = ref();

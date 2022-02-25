@@ -60,9 +60,8 @@ export default {
   }),
   setup() {
     const router = useRouter();
-    const goToMeetup = (id, creatorId) => {
-      const isTheSameUser = localStorage.getItem("uid") === creatorId;
-      router.push({ name: "Meetup", params: { id }, query: { isTheSameUser } });
+    const goToMeetup = (id) => {
+      router.push({ name: "Meetup", params: { id } });
     };
     return {
       goToMeetup,
