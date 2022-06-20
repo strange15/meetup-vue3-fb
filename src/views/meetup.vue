@@ -25,7 +25,9 @@
       <div class="px-3 text-sm">{{ meetup?.description }}</div>
       <div class="w-full flex justify-end pr-4">
         <!-- TODO -->
-        <el-button type="danger">REGISTER</el-button>
+        <el-button @click="dialogRegisterConfirm = true" type="danger">
+          {{ userIsRegistered ? 'Unregister' : 'Register' }}
+        </el-button>
       </div>
     </div>
 
@@ -87,6 +89,18 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+
+    <el-dialog
+      v-model="dialogRegisterConfirm"
+      :title="`
+        ${
+          userIsRegistered ? 'Unregister from Meetup?' : 'Register from Meetup?'
+        }`"
+    >
+      <p>You can always change your decision later on.</p>
+      <el-button type="primary" @click="submitRegister(userIsRegistered)">CONFIRM</el-button>
+      <el-button @click="dialogRegisterConfirm = false">CANCEL</el-button>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -98,6 +112,7 @@ export default {
   setup() {
     let dialogFormVisible = ref(false);
     let dialogDateFormVisible = ref(false);
+    let dialogRegisterConfirm = ref(false);
     const route = useRoute();
     const store = useStore();
     const loading = computed(() => {
@@ -110,6 +125,11 @@ export default {
     });
     let canEdit = computed(() => {
       return localStorage.getItem("uid") === meetup.value?.creatorId;
+    });
+    let userIsRegistered = computed(() => {
+      return store.getters.user.registeredMeetups.findIndex((meetupId) => {
+        return meetupId === route.params.id;
+      }) >= 0;
     });
 
     const meetupForm = ref();
@@ -197,20 +217,32 @@ export default {
         }
       });
     };
+    const submitRegister = (isRegistered) => {
+      dialogRegisterConfirm.value = false;
+      if (isRegistered) {
+        store.dispatch("unregisterUserForMeetup", route.params.id);
+      } else {
+        store.dispatch("registerUserForMeetup", route.params.id);
+
+      }
+    };
 
     return {
       meetup,
       dialogFormVisible,
       dialogDateFormVisible,
+      dialogRegisterConfirm,
       meetupForm,
       meetupDateForm,
       submitForm,
       submitDateForm,
+      submitRegister,
       ruleForm,
       ruleDateForm,
       rules,
       rulesDate,
       canEdit,
+      userIsRegistered,
       loading,
     };
   },

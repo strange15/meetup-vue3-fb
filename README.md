@@ -28,3 +28,8 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ```
 npm run serve -- --port XXXX
 ```
+
+### 部署到 Github Pages
+```
+sh deploy.sh   
+```

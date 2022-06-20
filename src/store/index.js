@@ -6,7 +6,7 @@ import {
   signOut,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { getDatabase, ref, child, get, push, update } from "firebase/database";
+import { getDatabase, ref, child, get, push, update, remove } from "firebase/database";
 import { ElMessage } from "element-plus";
 import router from "../router";
 
@@ -36,6 +36,19 @@ export default createStore({
     loading: false,
   },
   mutations: {
+    registerUserForMeetup(state, payload) {
+      const id = payload.id;
+      if (state.user.registeredMeetups.findIndex((meetup) => meetup.id === id) >= 0) {
+        return;
+      }
+      state.user.registeredMeetups.push(id);
+      state.user.fbKeys[id] = payload.fbKey;
+    },
+    unregisterUserForMeetup(state, payload) {
+      const registeredMeetups = state.user.registeredMeetups;
+      registeredMeetups.splice(registeredMeetups.findIndex((meetup) => meetup.id === payload), 1);
+      Reflect.deleteProperty(state.user.fbKeys, payload);
+    },
     setLoadedMeetups(state, payload) {
       state.loadedMeetups = payload;
     },
@@ -61,6 +74,39 @@ export default createStore({
     },
   },
   actions: {
+    registerUserForMeetup({ commit, getters }, payload) {
+      commit("setLoading", true);
+      const user = getters.user;
+      const db = getDatabase();
+
+      push(ref(db, "/users/" + user.id + "/registerations/"), payload)
+        .then((data) => {
+          commit("setLoading", false);
+          commit("registerUserForMeetup", { id: payload, fbKey: data.key });
+        })
+        .catch((error) => {
+          commit("setLoading", false);
+          ElMessage.error(error.message);
+        });
+    },
+    unregisterUserForMeetup({ commit, getters }, payload) {
+      commit("setLoading", true);
+      const user = getters.user;
+      if (!user.fbKeys) {
+        return;
+      }
+      const fbKey = user.fbKeys[payload];
+      const db = getDatabase();
+      remove(ref(db, "/users/" + user.id + "/registerations/" + fbKey))
+        .then(() => {
+          commit("setLoading", false);
+          commit("unregisterUserForMeetup", payload);
+        })
+        .catch((error) => {
+          commit("setLoading", false);
+          ElMessage.error(error.message);
+        });
+    },
     loadMeetups({ commit }) {
       commit("setLoading", true);
       const dbRef = ref(getDatabase());
@@ -163,6 +209,7 @@ export default createStore({
           const newUser = {
             id: res.user.uid,
             registeredMeetups: [],
+            fbKeys: {},
           };
           commit("setUser", newUser);
           localStorage.setItem("uid", res.user.uid);
@@ -186,6 +233,7 @@ export default createStore({
           const newUser = {
             id: res.user.uid,
             registeredMeetups: [],
+            fbKeys: {},
           };
           commit("setUser", newUser);
           localStorage.setItem("uid", res.user.uid);
@@ -197,7 +245,11 @@ export default createStore({
         });
     },
     autoSignIn({ commit }, payload) {
-      commit("setUser", { id: payload.uid, registeredMeetups: [] });
+      commit("setUser", {
+        id: payload.uid,
+        registeredMeetups: [],
+        fbKeys: {},
+      });
       localStorage.setItem("uid", payload.uid);
     },
     logout({ commit }) {
