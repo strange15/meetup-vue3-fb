@@ -23,10 +23,9 @@
         <el-button @click="dialogDateFormVisible = true" type="primary">EDIT DATE AND TIME</el-button>
       </div>
       <div class="px-3 text-sm">{{ meetup?.description }}</div>
-      <div class="w-full flex justify-end pr-4">
-        <!-- TODO -->
+      <div class="w-full flex justify-end pr-4" v-show="userIsAuthenticated">
         <el-button @click="dialogRegisterConfirm = true" type="danger">
-          {{ userIsRegistered ? 'Unregister' : 'Register' }}
+          {{ userIsRegistered ? 'UNREGISTER' : 'REGISTER' }}
         </el-button>
       </div>
     </div>
@@ -118,6 +117,9 @@ export default {
     const loading = computed(() => {
       return store.getters.loading;
     });
+    let userIsAuthenticated = computed(() => {
+      return store.getters.user !== null && store.getters.user !== undefined;
+    });
     let meetup = computed(() => {
       return store.getters.loadedMeetups.find((item) => {
         return item.id === route.params.id;
@@ -127,6 +129,7 @@ export default {
       return localStorage.getItem("uid") === meetup.value?.creatorId;
     });
     let userIsRegistered = computed(() => {
+      if (!userIsAuthenticated.value) return;
       return store.getters.user.registeredMeetups.findIndex((meetupId) => {
         return meetupId === route.params.id;
       }) >= 0;
@@ -243,6 +246,7 @@ export default {
       rulesDate,
       canEdit,
       userIsRegistered,
+      userIsAuthenticated,
       loading,
     };
   },

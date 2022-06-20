@@ -28,6 +28,7 @@ function initFirebase() {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       store.dispatch("autoSignIn", user);
+      store.dispatch("fetchUserData");
     }
   });
   store.dispatch("loadMeetups");

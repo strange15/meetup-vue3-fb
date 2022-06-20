@@ -6,7 +6,16 @@ import {
   signOut,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { getDatabase, ref, child, get, push, update, remove } from "firebase/database";
+import {
+  getDatabase,
+  ref,
+  child,
+  get,
+  push,
+  update,
+  remove,
+  onValue,
+} from "firebase/database";
 import { ElMessage } from "element-plus";
 import router from "../router";
 
@@ -251,6 +260,30 @@ export default createStore({
         fbKeys: {},
       });
       localStorage.setItem("uid", payload.uid);
+    },
+    fetchUserData({ commit, getters }) {
+      commit("setLoading", true);
+      const db = getDatabase();
+      return onValue(
+        ref(db, "/users/" + getters.user.id + "/registerations/"),
+        (snapshot) => {
+          const dataPairs = snapshot.val();
+          let registeredMeetups = [];
+          let swappedPairs = {};
+          for (let key in dataPairs) {
+            registeredMeetups.push(dataPairs[key]);
+            swappedPairs[dataPairs[key]] = key;
+          }
+          const updatedUser = {
+            id: getters.user.id,
+            registeredMeetups: registeredMeetups,
+            fbKeys: swappedPairs,
+          }
+          commit("setLoading", false);
+          commit("setUser", updatedUser);
+      }, {
+        onlyOnce: true
+      });
     },
     logout({ commit }) {
       const auth = getAuth();
