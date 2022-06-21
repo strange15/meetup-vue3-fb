@@ -92,6 +92,7 @@ export default createStore({
         .then((data) => {
           commit("setLoading", false);
           commit("registerUserForMeetup", { id: payload, fbKey: data.key });
+          ElMessage.success('You have successfully registered for this meetup!');
         })
         .catch((error) => {
           commit("setLoading", false);
@@ -110,6 +111,7 @@ export default createStore({
         .then(() => {
           commit("setLoading", false);
           commit("unregisterUserForMeetup", payload);
+          ElMessage.warning("You have successfully unregistered for this meetup");
         })
         .catch((error) => {
           commit("setLoading", false);

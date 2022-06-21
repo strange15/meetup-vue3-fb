@@ -28,7 +28,7 @@
       height="28rem"
       :interval="5000"
       class="w-5/6 mx-auto my-0"
-      v-if="!loading"
+      v-show="!loading"
     >
       <el-carousel-item
         class="relative"

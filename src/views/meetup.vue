@@ -20,7 +20,11 @@
         {{ meetup?.date }} - {{ meetup?.location }}
       </div>
       <div class="w-full flex my-4 pl-4">
-        <el-button @click="dialogDateFormVisible = true" type="primary">EDIT DATE AND TIME</el-button>
+        <el-button
+          @click="dialogDateFormVisible = true"
+          type="primary"
+          v-show="canEdit"
+        >EDIT DATE AND TIME</el-button>
       </div>
       <div class="px-3 text-sm">{{ meetup?.description }}</div>
       <div class="w-full flex justify-end pr-4" v-show="userIsAuthenticated">
@@ -96,7 +100,7 @@
           userIsRegistered ? 'Unregister from Meetup?' : 'Register from Meetup?'
         }`"
     >
-      <p>You can always change your decision later on.</p>
+      <p class="dialog-content">You can always change your decision later on.</p>
       <el-button type="primary" @click="submitRegister(userIsRegistered)">CONFIRM</el-button>
       <el-button @click="dialogRegisterConfirm = false">CANCEL</el-button>
     </el-dialog>
@@ -226,7 +230,6 @@ export default {
         store.dispatch("unregisterUserForMeetup", route.params.id);
       } else {
         store.dispatch("registerUserForMeetup", route.params.id);
-
       }
     };
 
@@ -252,3 +255,9 @@ export default {
   },
 };
 </script>
+<style scoped lang="scss">
+.dialog-content {
+  margin: 1rem 0 2rem 0;
+  font-size: 1rem;
+}
+</style>
